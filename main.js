@@ -1,9 +1,13 @@
 
-const WINNING_SCORE = 2,
+const carPic = document.createElement("img"),
+  canvas = document.getElementById('gameCanvas'),
+  canvasContext = canvas.getContext('2d'),
   TRACK_W = 40,
   TRACK_H = 40,
   TRACK_GAP = 2,
   TRACK_COLS = 20,
+  CAR_WIDTH = 60,
+  CAR_HEIGHT = 30,
   TRACK_ROWS = 15,
   trackGrid =
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -21,34 +25,41 @@ const WINNING_SCORE = 2,
       1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
       1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-canvas = document.getElementById('gameCanvas'),
-  canvasContext = canvas.getContext('2d');
+
 
 let carX = canvas.width / 2 + 50,
   carY = canvas.height / 2,
   speed = 2,
   carSpeedX = speed,
   carSpeedY = speed,
+  carPicLoaded = false,
   carRadius = 10;
 
 
 window.onload = function () {
   let framesPerSecond = 60;
+  //	load	car	image
+
+  carPic.onload = function () {
+    carPicLoaded = true; //	dont	try	to	display	until	it’s	loaded
+
+  }
+  carPic.src = "player1.png";
+
+
   setInterval(function () {
     moveEverething();
     drawEverething();
 
   }, 1000 / framesPerSecond);
-
 }
 
 function drawEverething() {
   colorRect(0, 0, canvas.width, canvas.height, 'black')
   //circle
-  colorCircle(carX, carY, carRadius, 'white');
-
+  carDraw();
   //tracks
-  drawTracks()
+  drawTracks();
 }
 
 function colorRect(topLeftX, topLeftY, boxWidth, boxHeight, fillColor) {
@@ -62,6 +73,13 @@ function colorCircle(centerX, centerY, radius, fillColor) {
   canvasContext.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
   canvasContext.fill();
 }
+
+function carDraw() {
+  if (carPicLoaded) {
+    canvasContext.drawImage(carPic, carX - CAR_WIDTH / 2, carY - CAR_HEIGHT / 2, CAR_WIDTH, CAR_HEIGHT);
+  }
+}
+
 
 function calculateMousePos(e) {
   let rect = canvas.getBoundingClientRect(), root = document.documentElement;
