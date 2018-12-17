@@ -2,6 +2,7 @@
 const carPic = document.createElement("img"),
   canvas = document.getElementById('gameCanvas'),
   canvasContext = canvas.getContext('2d'),
+  FRAME_PER_SECOND = 30,
   TRACK_W = 40,
   TRACK_H = 40,
   TRACK_GAP = 2,
@@ -30,6 +31,8 @@ const carPic = document.createElement("img"),
 let carX = canvas.width / 2 + 50,
   carY = canvas.height / 2,
   speed = 2,
+  carAng = 0,
+  carAngRotate = 0.2,
   carSpeedX = speed,
   carSpeedY = speed,
   carPicLoaded = false,
@@ -37,12 +40,10 @@ let carX = canvas.width / 2 + 50,
 
 
 window.onload = function () {
-  let framesPerSecond = 60;
   //	load	car	image
 
   carPic.onload = function () {
     carPicLoaded = true; //	dont	try	to	display	until	it’s	loaded
-
   }
   carPic.src = "player1.png";
 
@@ -51,7 +52,7 @@ window.onload = function () {
     moveEverething();
     drawEverething();
 
-  }, 1000 / framesPerSecond);
+  }, 1000 / FRAME_PER_SECOND);
 }
 
 function drawEverething() {
@@ -75,9 +76,18 @@ function colorCircle(centerX, centerY, radius, fillColor) {
 }
 
 function carDraw() {
+  carAng += carAngRotate;
   if (carPicLoaded) {
-    canvasContext.drawImage(carPic, carX - CAR_WIDTH / 2, carY - CAR_HEIGHT / 2, CAR_WIDTH, CAR_HEIGHT);
+    drawBitmapCenteredAtLocationWithRotation(carPic, carX, carY, CAR_WIDTH, CAR_HEIGHT, carAng)
   }
+}
+
+function drawBitmapCenteredAtLocationWithRotation(graphic, atX, atY, graphicWidth, graphicHeight, withAngle) {
+  canvasContext.save();	//	allows	us	to	undo	translate	movement	and	rotate	spin
+  canvasContext.translate(atX, atY);	//	sets	the	point	where	our	graphic	will	go
+  canvasContext.rotate(withAngle);	//	sets	the	rotation
+  canvasContext.drawImage(graphic, -graphicWidth / 2, - graphicHeight / 2, graphicWidth, graphicHeight);	//	center,	draw
+  canvasContext.restore();	//	undo	the	translation	movement	and	rotation	since	save()
 }
 
 
