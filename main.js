@@ -7,13 +7,13 @@ const carPic = document.createElement("img"),
   TRACK_H = 40,
   TRACK_GAP = 2,
   TRACK_COLS = 20,
-  CAR_WIDTH = 60,
-  CAR_HEIGHT = 30,
+  TRACK_ROWS = 15,
+  CAR_WIDTH = 40,
+  CAR_HEIGHT = 20,
   KEY_UP = 87,
   KEY_DOWN = 83,
   KEY_LEFT = 65,
   KEY_RIGTH = 68,
-  TRACK_ROWS = 15,
   GROUNDSPEED_DECAY_MULT = 0.9,
   DRIVE_POWER = 0.5,
   REVERSE_POWER = 0.2,
@@ -30,18 +30,20 @@ const carPic = document.createElement("img"),
       1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
       1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
       1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-      1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+      1, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1,
       1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
       1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
       1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  TRACK_ROAD = 0,
+  TRACK_WALL = 1,
+  TRACK_PLAYER = 2;
 
 
-let carX = canvas.width / 2 + 50,
-  carY = canvas.height / 2,
+let carX = 75, carY = 75,
   carSpeed = 0,
-  carAng = 0,
-  startAng = Math.PI,
+  startCarAng = Math.PI,
+  carAng = -0.5 * Math.PI,
   carAngRotate = 0.2,
   keyHeldGas = false,
   keyHeldReverse = false,
@@ -52,6 +54,7 @@ let carX = canvas.width / 2 + 50,
 
 
 window.onload = function () {
+
   document.addEventListener('keydown', keyPressed);
   document.addEventListener('keyup', keyReleased);
   //	load	car	image
@@ -60,6 +63,7 @@ window.onload = function () {
   }
   carPic.src = "player1.png";
 
+  carReset();
 
   setInterval(function () {
     moveEverething();
@@ -124,7 +128,7 @@ function carDraw() {
 function drawBitmapCenteredAtLocationWithRotation(graphic, atX, atY, graphicWidth, graphicHeight, withAngle) {
   canvasContext.save();	//	allows	us	to	undo	translate	movement	and	rotate	spin
   canvasContext.translate(atX, atY);	//	sets	the	point	where	our	graphic	will	go
-  canvasContext.rotate(startAng + withAngle);	//	sets	the	rotation
+  canvasContext.rotate(startCarAng + withAngle);	//	sets	the	rotation
   canvasContext.drawImage(graphic, -graphicWidth / 2, - graphicHeight / 2, graphicWidth, graphicHeight);	//	center,	draw
   canvasContext.restore();	//	undo	the	translation	movement	and	rotation	since	save()
 }
@@ -159,8 +163,15 @@ function moveEverething() {
 }
 
 function carReset() {
-  carX = canvas.width / 2;
-  carY = canvas.height / 2;
+  for (let i = 0; i < trackGrid.length; i++) {
+    if (trackGrid[i] === TRACK_PLAYER) {
+      tileRow = Math.floor(i / TRACK_COLS);
+      tileCol = i % TRACK_COLS;
+      trackGrid[i] = TRACK_ROAD;
+    }
+  }
+  carX = tileCol * TRACK_W + TRACK_W / 2;
+  carY = tileRow * TRACK_H + TRACK_H / 2;
 }
 
 
