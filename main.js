@@ -4,20 +4,31 @@ const canvas = document.getElementById('gameCanvas'),
   FRAME_PER_SECOND = 30;
 
 window.onload = function () {
+  loadImages();
   initInput();
-  carInit();
+  countLoadedImageAndLaunchIfReady();
   carReset();
+}
+
+
+function loadingDoneSoStartGame() {
   setInterval(function () {
     moveEverething();
     drawEverething();
   }, 1000 / FRAME_PER_SECOND);
 }
 
+function countLoadedImageAndLaunchIfReady() {
+  picsToLoad--;
+  if (picsToLoad === 0) {
+    loadingDoneSoStartGame();
+  }
+}
 
 function drawEverething() {
-  colorRect(0, 0, canvas.width, canvas.height, 'black')
-  carDraw();
   drawTracks();
+  carDraw();
+
 }
 
 function moveEverething() {

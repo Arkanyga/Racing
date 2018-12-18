@@ -1,8 +1,6 @@
 
-const carPic = document.createElement("img"),
-  CAR_WIDTH = 40,
-  CAR_HEIGHT = 20,
-  GROUNDSPEED_DECAY_MULT = 0.9,
+
+const GROUNDSPEED_DECAY_MULT = 0.9,
   DRIVE_POWER = 0.5,
   REVERSE_POWER = 0.2,
   TURN_RATE = 0.03,
@@ -11,25 +9,12 @@ const carPic = document.createElement("img"),
 
 let carX, carY,
   carSpeed = 0,
-  startCarAng = Math.PI,
   carAng = -0.5 * Math.PI,
-  carAngRotate = 0.2,
-  carPicLoaded = false;
-
-function carInit() {
-  //	load	car	image
-  carPic.onload = function () {
-    carPicLoaded = true; //	dont	try	to	display	until	it’s	loaded
-  }
-  carPic.src = "player1.png";
-  carReset();
-}
+  carAngRotate = 0.2;
 
 
 function carDraw() {
-  if (carPicLoaded) {
-    drawBitmapCenteredAtLocationWithRotation(carPic, carX, carY, CAR_WIDTH, CAR_HEIGHT, carAng)
-  }
+  drawBitmapCenteredAtLocationWithRotation(carPic, carX, carY, carAng)
 }
 
 

@@ -1,7 +1,6 @@
 
 const TRACK_W = 40,
   TRACK_H = 40,
-  TRACK_GAP = 2,
   TRACK_COLS = 20,
   TRACK_ROWS = 15,
   trackGrid =
@@ -28,11 +27,12 @@ const TRACK_W = 40,
 function drawTracks() {
   for (let col = 0; col < TRACK_COLS; col++) {
     for (let row = 0; row < TRACK_ROWS; row++) {
+      let trackLeftEdgeX = col * TRACK_W;
+      let trackTopEdgeY = row * TRACK_H;
       if (isWallAtTileCoord(col, row)) {
-        let trackLeftEdgeX = col * TRACK_W;
-        let trackTopEdgeY = row * TRACK_H;
-        colorRect(trackLeftEdgeX, trackTopEdgeY, TRACK_W - TRACK_GAP,
-          TRACK_H - TRACK_GAP, 'blue');
+        canvasContext.drawImage(trackPicWall, trackLeftEdgeX, trackTopEdgeY);
+      } else {
+        canvasContext.drawImage(trackPicRoad, trackLeftEdgeX, trackTopEdgeY);
       }
     }
   }
