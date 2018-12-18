@@ -9,6 +9,10 @@ const carPic = document.createElement("img"),
   TRACK_COLS = 20,
   CAR_WIDTH = 60,
   CAR_HEIGHT = 30,
+  KEY_UP = 87,
+  KEY_DOWN = 83,
+  KEY_LEFT = 65,
+  KEY_RIGTH = 68,
   TRACK_ROWS = 15,
   trackGrid =
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -30,18 +34,17 @@ const carPic = document.createElement("img"),
 
 let carX = canvas.width / 2 + 50,
   carY = canvas.height / 2,
-  speed = 2,
+  carSpeed = 0,
   carAng = 0,
-  carAngRotate = 0.2,
-  carSpeedX = speed,
-  carSpeedY = speed,
-  carPicLoaded = false,
+  carAngRotate = 0.2
+carPicLoaded = false,
   carRadius = 10;
 
 
 window.onload = function () {
+  document.addEventListener('keydown', keyPressed);
+  document.addEventListener('keyup', keyReleased);
   //	load	car	image
-
   carPic.onload = function () {
     carPicLoaded = true; //	dont	try	to	display	until	it’s	loaded
   }
@@ -53,6 +56,33 @@ window.onload = function () {
     drawEverething();
 
   }, 1000 / FRAME_PER_SECOND);
+}
+
+function keyPressed(e) {
+  e.preventDefault();
+  document.getElementById('debugText').innerHTML = e.keyCode;
+  switch (e.keyCode) {
+    case KEY_UP:
+      carSpeed -= 0.2;
+      break
+    case KEY_DOWN:
+      carSpeed += 0.2;
+      break
+    case KEY_LEFT:
+      carAng -= 0.25 * Math.PI;
+      break;
+    case KEY_RIGTH:
+      carAng += 0.25 * Math.PI;
+      break;
+  }
+
+}
+
+function keyReleased(e) {
+  document.getElementById('debugText').innerHTML = e.keyCode;
+  // if (e.keyCode === KEY_UP_ARROW) {
+  //   carSpeed -= 1.5;
+  // }
 }
 
 function drawEverething() {
@@ -76,7 +106,6 @@ function colorCircle(centerX, centerY, radius, fillColor) {
 }
 
 function carDraw() {
-  carAng += carAngRotate;
   if (carPicLoaded) {
     drawBitmapCenteredAtLocationWithRotation(carPic, carX, carY, CAR_WIDTH, CAR_HEIGHT, carAng)
   }
@@ -102,31 +131,13 @@ function calculateMousePos(e) {
 }
 
 function moveEverething() {
-  if (carX < 0 || carX > canvas.width) {
-    carSpeedX *= -1;
-  }
-  // if (carY < 0 || carY > canvas.height) {
-  //   carSpeedY *= -1;
-  // }
-  if (carY > canvas.height) {
-    carReset();
-  } else if (carY < 0) {
-    carSpeedY *= -1;
-  }
-  carX += carSpeedX;
-  carY += carSpeedY;
-  bounceOffTrackAtPixelCoord(carX, carY);
+  carX += Math.cos(carAng) * carSpeed;
+  carY += Math.sin(carAng) * carSpeed;
 }
 
 function carReset() {
   carX = canvas.width / 2;
   carY = canvas.height / 2;
-  carSpeedX = 0;
-  carSpeedY = 0;
-  setTimeout(function () {
-    carSpeedX = speed;
-    carSpeedY = speed;
-  }, 800)
 }
 
 
@@ -151,47 +162,47 @@ function isTrackAtTileCoord(trackTileCol, trackTileRow) {
 }
 
 
-function bounceOffTrackAtPixelCoord(pixelX, pixelY) {
-  let tileCol = Math.floor(pixelX / TRACK_W);
-  let tileRow = Math.floor(pixelY / TRACK_H);
-  //проверяем находится ли мяч в районе кирпичей
-  if (tileCol < 0 || tileCol >= TRACK_COLS || tileRow < 0 || tileRow >= TRACK_ROWS) {
-    return
-  }
+// function bounceOffTrackAtPixelCoord(pixelX, pixelY) {
+//   let tileCol = Math.floor(pixelX / TRACK_W);
+//   let tileRow = Math.floor(pixelY / TRACK_H);
+//   //проверяем находится ли мяч в районе кирпичей
+//   if (tileCol < 0 || tileCol >= TRACK_COLS || tileRow < 0 || tileRow >= TRACK_ROWS) {
+//     return
+//   }
 
-  //индекс ячейки в которую ударили
-  let trackIndex = trackTileToIndex(tileCol, tileRow);
-  if (trackGrid[trackIndex] === 1) {
-    let prevCarX = carX - carSpeedX;
-    let prevCarY = carY - carSpeedY;
-    let prevTileCol = Math.floor(prevCarX / TRACK_W);
-    let prevTileRow = Math.floor(prevCarY / TRACK_H);
-    let bothTestsFailed = true;
-    //если попадаем и меняется колонка то отскакивает горизонтально
-    if (prevTileCol != tileCol) {
-      let adjacentTrackIndex = trackTileToIndex(prevTileCol, tileRow);//свободна или нет ячейка в prevTileCol для теста 
-      if (trackGrid[adjacentTrackIndex] !== 1) {
-        carSpeedX *= -1;
-        bothTestsFailed = false;
-      }
-    }
-    //если попадаем и меняется ряд то отскакивает вертикально
-    if (prevTileRow != tileRow) {
-      let adjacentTrackIndex = trackTileToIndex(tileCol, prevTileRow);//свободна или нет ячейка в prevTileCol для теста 
-      if (trackGrid[adjacentTrackIndex] !== 1) {
-        carSpeedY *= -1;
-        bothTestsFailed = false;
-      }
-    }
+//   //индекс ячейки в которую ударили
+//   let trackIndex = trackTileToIndex(tileCol, tileRow);
+//   if (trackGrid[trackIndex] === 1) {
+//     let prevCarX = carX - carSpeedX;
+//     let prevCarY = carY - carSpeedY;
+//     let prevTileCol = Math.floor(prevCarX / TRACK_W);
+//     let prevTileRow = Math.floor(prevCarY / TRACK_H);
+//     let bothTestsFailed = true;
+//     //если попадаем и меняется колонка то отскакивает горизонтально
+//     if (prevTileCol != tileCol) {
+//       let adjacentTrackIndex = trackTileToIndex(prevTileCol, tileRow);//свободна или нет ячейка в prevTileCol для теста 
+//       if (trackGrid[adjacentTrackIndex] !== 1) {
+//         carSpeedX *= -1;
+//         bothTestsFailed = false;
+//       }
+//     }
+//     //если попадаем и меняется ряд то отскакивает вертикально
+//     if (prevTileRow != tileRow) {
+//       let adjacentTrackIndex = trackTileToIndex(tileCol, prevTileRow);//свободна или нет ячейка в prevTileCol для теста 
+//       if (trackGrid[adjacentTrackIndex] !== 1) {
+//         carSpeedY *= -1;
+//         bothTestsFailed = false;
+//       }
+//     }
 
-    //если попадаем наискосок в место где с двух сторон стоят клетки 
-    if (bothTestsFailed) {
-      carSpeedY *= -1;
-      carSpeedX *= -1;
-    }
-    //удаляем кирпич
-  }
-}
+//     //если попадаем наискосок в место где с двух сторон стоят клетки 
+//     if (bothTestsFailed) {
+//       carSpeedY *= -1;
+//       carSpeedX *= -1;
+//     }
+//     //удаляем кирпич
+//   }
+// }
 
 function trackTileToIndex(tileCol, tileRow) {
   return (tileCol + TRACK_COLS * tileRow)
