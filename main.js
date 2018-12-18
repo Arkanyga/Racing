@@ -14,6 +14,11 @@ const carPic = document.createElement("img"),
   KEY_LEFT = 65,
   KEY_RIGTH = 68,
   TRACK_ROWS = 15,
+  GROUNDSPEED_DECAY_MULT = 0.9,
+  DRIVE_POWER = 0.5,
+  REVERSE_POWER = 0.2,
+  TURN_RATE = 0.03,
+  MIN_TURN_SPEED = 1.5,
   trackGrid =
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
       1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
@@ -36,8 +41,13 @@ let carX = canvas.width / 2 + 50,
   carY = canvas.height / 2,
   carSpeed = 0,
   carAng = 0,
-  carAngRotate = 0.2
-carPicLoaded = false,
+  startAng = Math.PI,
+  carAngRotate = 0.2,
+  keyHeldGas = false,
+  keyHeldReverse = false,
+  keyHeldTurnLeft = false,
+  keyHeldTurnRight = false,
+  carPicLoaded = false,
   carRadius = 10;
 
 
@@ -60,29 +70,29 @@ window.onload = function () {
 
 function keyPressed(e) {
   e.preventDefault();
-  document.getElementById('debugText').innerHTML = e.keyCode;
-  switch (e.keyCode) {
-    case KEY_UP:
-      carSpeed -= 0.2;
-      break
-    case KEY_DOWN:
-      carSpeed += 0.2;
-      break
-    case KEY_LEFT:
-      carAng -= 0.25 * Math.PI;
-      break;
-    case KEY_RIGTH:
-      carAng += 0.25 * Math.PI;
-      break;
-  }
-
+  setKeyHoldState(e, true)
 }
 
 function keyReleased(e) {
-  document.getElementById('debugText').innerHTML = e.keyCode;
-  // if (e.keyCode === KEY_UP_ARROW) {
-  //   carSpeed -= 1.5;
-  // }
+  e.preventDefault();
+  setKeyHoldState(e, false)
+}
+
+function setKeyHoldState(e, state) {
+  switch (e.keyCode) {
+    case KEY_UP:
+      keyHeldGas = state;
+      break
+    case KEY_DOWN:
+      keyHeldReverse = state;
+      break
+    case KEY_LEFT:
+      keyHeldTurnLeft = state;
+      break;
+    case KEY_RIGTH:
+      keyHeldTurnRight = state;
+      break;
+  }
 }
 
 function drawEverething() {
@@ -114,7 +124,7 @@ function carDraw() {
 function drawBitmapCenteredAtLocationWithRotation(graphic, atX, atY, graphicWidth, graphicHeight, withAngle) {
   canvasContext.save();	//	allows	us	to	undo	translate	movement	and	rotate	spin
   canvasContext.translate(atX, atY);	//	sets	the	point	where	our	graphic	will	go
-  canvasContext.rotate(withAngle);	//	sets	the	rotation
+  canvasContext.rotate(startAng + withAngle);	//	sets	the	rotation
   canvasContext.drawImage(graphic, -graphicWidth / 2, - graphicHeight / 2, graphicWidth, graphicHeight);	//	center,	draw
   canvasContext.restore();	//	undo	the	translation	movement	and	rotation	since	save()
 }
@@ -131,8 +141,21 @@ function calculateMousePos(e) {
 }
 
 function moveEverething() {
+  if (keyHeldGas) {
+    carSpeed += DRIVE_POWER;
+  }
+  if (keyHeldReverse) {
+    carSpeed -= REVERSE_POWER;
+  }
+  if (keyHeldTurnLeft && Math.abs(carSpeed) > MIN_TURN_SPEED) {
+    carAng -= TURN_RATE * Math.PI;
+  }
+  if (keyHeldTurnRight && Math.abs(carSpeed) > MIN_TURN_SPEED) {
+    carAng += TURN_RATE * Math.PI;
+  }
   carX += Math.cos(carAng) * carSpeed;
   carY += Math.sin(carAng) * carSpeed;
+  carSpeed *= GROUNDSPEED_DECAY_MULT;
 }
 
 function carReset() {
