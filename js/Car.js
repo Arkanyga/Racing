@@ -1,5 +1,4 @@
 
-
 const GROUNDSPEED_DECAY_MULT = 0.93,
   DRIVE_POWER = 0.5,
   REVERSE_POWER = 0.2,
@@ -7,49 +6,97 @@ const GROUNDSPEED_DECAY_MULT = 0.93,
   MIN_TURN_SPEED = 1.5;
 
 
-let carX, carY,
-  carSpeed = 0,
-  carAng = -0.5 * Math.PI,
-  carAngRotate = 0.2;
 
-
-function carDraw() {
-  drawBitmapCenteredAtLocationWithRotation(carPic, carX, carY, carAng)
-}
-
-
-function carMove() {
-  let nextCarX = carX + Math.cos(carAng) * carSpeed;
-  let nextCarY = carY + Math.sin(carAng) * carSpeed;
-  if (checkForTrackAtPixelCoord(nextCarX, nextCarY)) {
-    if (keyHeldGas) {
-      carSpeed += DRIVE_POWER;
-    }
-    if (keyHeldReverse) {
-      carSpeed -= REVERSE_POWER;
-    }
-    if (keyHeldTurnLeft && Math.abs(carSpeed) > MIN_TURN_SPEED) {
-      carAng -= TURN_RATE * Math.PI;
-    }
-    if (keyHeldTurnRight && Math.abs(carSpeed) > MIN_TURN_SPEED) {
-      carAng += TURN_RATE * Math.PI;
-    }
-    carX = nextCarX;
-    carY = nextCarY;
-  } else {
-    carSpeed = 0;
+class Car {
+  constructor(gasKey, reverseKey, leftKey, rightKey) {
+    this.carX;
+    this.carY;
+    this.carSpeed = 0;
+    this.carAng = -0.5 * Math.PI;
+    this.keyHeldGas = false;
+    this.keyHeldReverse = false;
+    this.keyHeldTurnLeft = false;
+    this.keyHeldTurnRight = false;
+    this.controlKeyForGas = gasKey;
+    this.controlKeyForReverse = reverseKey;
+    this.controlKeyForTurnLeft = leftKey;
+    this.controlKeyForTurnRight = rightKey;
   }
-  carSpeed *= GROUNDSPEED_DECAY_MULT;
-}
 
-function carReset() {
-  for (let i = 0; i < trackGrid.length; i++) {
-    if (trackGrid[i] === TRACK_PLAYER) {
-      tileRow = Math.floor(i / TRACK_COLS);
-      tileCol = i % TRACK_COLS;
-      trackGrid[i] = TRACK_ROAD;
+  carDraw() {
+    drawBitmapCenteredAtLocationWithRotation(carPic, this.carX, this.carY, this.carAng)
+  }
+
+
+  carMove() {
+    let nextCarX = this.carX + Math.cos(this.carAng) * this.carSpeed;
+    let nextCarY = this.carY + Math.sin(this.carAng) * this.carSpeed;
+    if (checkForTrackAtPixelCoord(nextCarX, nextCarY)) {
+      if (this.keyHeldGas) {
+        this.carSpeed += DRIVE_POWER;
+      }
+      if (this.keyHeldReverse) {
+        this.carSpeed -= REVERSE_POWER;
+      }
+      if (this.keyHeldTurnLeft && Math.abs(this.carSpeed) > MIN_TURN_SPEED) {
+        this.carAng -= TURN_RATE * Math.PI;
+      }
+      if (this.keyHeldTurnRight && Math.abs(this.carSpeed) > MIN_TURN_SPEED) {
+        this.carAng += TURN_RATE * Math.PI;
+      }
+      this.carX = nextCarX;
+      this.carY = nextCarY;
+    } else {
+      this.carSpeed = 0;
+    }
+    this.carSpeed *= GROUNDSPEED_DECAY_MULT;
+  }
+
+  carReset() {
+    let tileRow, tileCol;
+    for (let i = 0; i < trackGrid.length; i++) {
+      if (trackGrid[i] === TRACK_PLAYER) {
+        tileRow = Math.floor(i / TRACK_COLS);
+        tileCol = i % TRACK_COLS;
+        trackGrid[i] = TRACK_ROAD;
+      }
+    }
+    this.carX = tileCol * TRACK_W + TRACK_W / 2;
+    this.carY = tileRow * TRACK_H + TRACK_H / 2;
+  }
+
+  initInput() {
+    document.addEventListener('keydown', this.keyPressed.bind(this));
+    document.addEventListener('keyup', this.keyReleased.bind(this));
+  }
+
+
+  setKeyHoldState(e, state) {
+    switch (e.keyCode) {
+      case this.controlKeyForGas:
+        this.keyHeldGas = state;
+        break
+      case this.controlKeyForReverse:
+        this.keyHeldReverse = state;
+        break
+      case this.controlKeyForTurnLeft:
+        this.keyHeldTurnLeft = state;
+        break;
+      case this.controlKeyForTurnRight:
+        this.keyHeldTurnRight = state;
+        break;
     }
   }
-  carX = tileCol * TRACK_W + TRACK_W / 2;
-  carY = tileRow * TRACK_H + TRACK_H / 2;
+
+  keyPressed(e) {
+    e.preventDefault();
+    this.setKeyHoldState(e, true)
+  }
+
+  keyReleased(e) {
+    e.preventDefault();
+    this.setKeyHoldState(e, false)
+  }
 }
+
+

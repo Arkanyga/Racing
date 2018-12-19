@@ -3,11 +3,18 @@ const canvas = document.getElementById('gameCanvas'),
   canvasContext = canvas.getContext('2d'),
   FRAME_PER_SECOND = 30;
 
+
+let p1 = new Car(87, 83, 65, 68);
+let p2 = new Car(38, 40, 37, 39);
+
+
+
+
 window.onload = function () {
   loadImages();
-  initInput();
+  p1.initInput();
   countLoadedImageAndLaunchIfReady();
-  carReset();
+  p1.carReset();
 }
 
 
@@ -27,10 +34,10 @@ function countLoadedImageAndLaunchIfReady() {
 
 function drawEverething() {
   drawTracks();
-  carDraw();
+  p1.carDraw();
 
 }
 
 function moveEverething() {
-  carMove();
+  p1.carMove();
 }

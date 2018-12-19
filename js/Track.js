@@ -28,12 +28,18 @@ const TRACK_W = 40,
 
 
 function drawTracks() {
-  for (let col = 0; col < TRACK_COLS; col++) {
-    for (let row = 0; row < TRACK_ROWS; row++) {
-      let trackIndex = trackTileToIndex(col, row);
+  let trackIndex = 0;
+  let trackLeftEdgeX = 0;
+  let trackTopEdgeY = 0;
+  for (let row = 0; row < TRACK_ROWS; row++) {
+    trackLeftEdgeX = 0;
+    for (let col = 0; col < TRACK_COLS; col++) {
       let trackTypeHere = trackGrid[trackIndex];
-      canvasContext.drawImage(trackPics[trackTypeHere], col * TRACK_W, row * TRACK_H);
+      canvasContext.drawImage(trackPics[trackTypeHere], trackLeftEdgeX, trackTopEdgeY);
+      trackIndex++;
+      trackLeftEdgeX += TRACK_W;
     }
+    trackTopEdgeY += TRACK_H;
   }
 }
 
