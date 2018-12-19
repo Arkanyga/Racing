@@ -4,43 +4,42 @@ const TRACK_W = 40,
   TRACK_COLS = 20,
   TRACK_ROWS = 15,
   trackGrid =
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-      1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    [4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4,
+      4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4,
       1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-      1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-      1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
-      1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1,
-      1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+      1, 0, 0, 0, 0, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 5, 0, 0, 0, 1,
+      1, 0, 0, 0, 5, 1, 1, 1, 4, 4, 4, 1, 1, 1, 1, 1, 5, 0, 0, 1,
+      1, 0, 0, 5, 1, 0, 0, 1, 4, 4, 4, 1, 0, 0, 0, 1, 1, 0, 0, 1,
+      1, 0, 0, 1, 0, 0, 0, 0, 1, 4, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
       1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-      1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-      1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-      1, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-      1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
-      1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
-      1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1,
-      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1, 0, 0, 1,
+      1, 0, 0, 1, 0, 0, 5, 0, 0, 0, 5, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+      1, 0, 2, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1,
+      1, 1, 1, 5, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+      0, 3, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
+      0, 3, 0, 0, 0, 0, 1, 4, 4, 1, 1, 1, 4, 4, 1, 0, 0, 0, 1, 4,
+      1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 4, 4],
   TRACK_ROAD = 0,
   TRACK_WALL = 1,
-  TRACK_PLAYER = 2;
+  TRACK_PLAYER = 2,
+  TRACK_FINISH = 3,
+  TRACK_FOREST = 4,
+  TRACK_POLL = 5;
 
 
 function drawTracks() {
   for (let col = 0; col < TRACK_COLS; col++) {
     for (let row = 0; row < TRACK_ROWS; row++) {
-      let trackLeftEdgeX = col * TRACK_W;
-      let trackTopEdgeY = row * TRACK_H;
-      if (isWallAtTileCoord(col, row)) {
-        canvasContext.drawImage(trackPicWall, trackLeftEdgeX, trackTopEdgeY);
-      } else {
-        canvasContext.drawImage(trackPicRoad, trackLeftEdgeX, trackTopEdgeY);
-      }
+      let trackIndex = trackTileToIndex(col, row);
+      let trackTypeHere = trackGrid[trackIndex];
+      canvasContext.drawImage(trackPics[trackTypeHere], col * TRACK_W, row * TRACK_H);
     }
   }
 }
 
 function isWallAtTileCoord(trackTileCol, trackTileRow) {
   let trackIndex = trackTileToIndex(trackTileCol, trackTileRow)
-  return (trackGrid[trackIndex] === 1)
+  return (trackGrid[trackIndex] === TRACK_WALL)
 }
 
 
