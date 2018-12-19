@@ -8,7 +8,7 @@ const GROUNDSPEED_DECAY_MULT = 0.93,
 
 
 class Car {
-  constructor(gasKey, reverseKey, leftKey, rightKey) {
+  constructor(gasKey, reverseKey, leftKey, rightKey, carPic) {
     this.carX;
     this.carY;
     this.carSpeed = 0;
@@ -21,10 +21,11 @@ class Car {
     this.controlKeyForReverse = reverseKey;
     this.controlKeyForTurnLeft = leftKey;
     this.controlKeyForTurnRight = rightKey;
+    this.carPic = carPic;
   }
 
   carDraw() {
-    drawBitmapCenteredAtLocationWithRotation(carPic, this.carX, this.carY, this.carAng)
+    drawBitmapCenteredAtLocationWithRotation(this.carPic, this.carX, this.carY, this.carAng)
   }
 
 
@@ -53,16 +54,16 @@ class Car {
   }
 
   carReset() {
-    let tileRow, tileCol;
     for (let i = 0; i < trackGrid.length; i++) {
       if (trackGrid[i] === TRACK_PLAYER) {
-        tileRow = Math.floor(i / TRACK_COLS);
-        tileCol = i % TRACK_COLS;
+        let tileRow = Math.floor(i / TRACK_COLS);
+        let tileCol = i % TRACK_COLS;
+        this.carX = tileCol * TRACK_W + TRACK_W / 2;
+        this.carY = tileRow * TRACK_H + TRACK_H / 2;
         trackGrid[i] = TRACK_ROAD;
+        return
       }
     }
-    this.carX = tileCol * TRACK_W + TRACK_W / 2;
-    this.carY = tileRow * TRACK_H + TRACK_H / 2;
   }
 
   initInput() {
