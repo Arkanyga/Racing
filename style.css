@@ -1,0 +1,17 @@
+*{
+  margin: 0;
+}
+#gameCanvas{
+  position: absolute;
+}
+
+#count{
+  position: relative;
+  font-size: 260px;
+  width: 100px;
+  top: 140px;
+  left: 320px;
+  font-family: Arial, sans-serif;
+  color: green;
+  display: none;
+}

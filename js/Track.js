@@ -4,7 +4,7 @@ const TRACK_W = 40,
   TRACK_COLS = 20,
   TRACK_ROWS = 15,
   trackGrid =
-    [4, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 4, 1, 1, 1, 1, 1, 4, 4, 4,
+    [4, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4,
       4, 4, 1, 0, 0, 0, 0, 0, 1, 4, 4, 4, 1, 0, 0, 0, 0, 1, 4, 4,
       4, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 4,
       1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -12,10 +12,10 @@ const TRACK_W = 40,
       1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1,
       1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1,
       1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-      1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-      1, 2, 2, 1, 0, 0, 5, 0, 0, 0, 5, 0, 0, 5, 0, 0, 1, 0, 0, 1,
+      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1,
+      1, 0, 0, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 5, 0, 0, 1, 0, 0, 1,
       5, 3, 3, 5, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 5, 0, 0, 1,
-      1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
+      1, 2, 2, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1,
       1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1,
       1, 1, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1,
       4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
@@ -43,24 +43,50 @@ function drawTracks() {
   }
 }
 
-function isWallAtTileCoord(trackTileCol, trackTileRow) {
-  let trackIndex = trackTileToIndex(trackTileCol, trackTileRow)
-  return (trackGrid[trackIndex] === TRACK_WALL)
-}
 
 
-function checkForTrackAtPixelCoord(pixelX, pixelY) {
-  let tileCol = Math.floor(pixelX / TRACK_W);
-  let tileRow = Math.floor(pixelY / TRACK_H);
-  //проверяем находится ли мяч в районе кирпичей
-  if (tileCol < 0 || tileCol >= TRACK_COLS || tileRow < 0 || tileRow >= TRACK_ROWS) {
-    return false
-  }
+function trackAtPixelCoord(pixelX, pixelY) {
+  let gridCoord = findOutRowAndCol(pixelX, pixelY)
   //индекс ячейки в которую ударили
-  let trackIndex = trackTileToIndex(tileCol, tileRow);
-  return (trackGrid[trackIndex] === TRACK_ROAD)
+  let trackIndex = gridCoord.col + TRACK_COLS * gridCoord.row;
+  return trackGrid[trackIndex];
 }
 
-function trackTileToIndex(tileCol, tileRow) {
-  return (tileCol + TRACK_COLS * tileRow)
+function findOutRowAndCol(pixelX, pixelY) {
+  let tileRow = Math.floor(pixelY / TRACK_H);
+  let tileCol = Math.floor(pixelX / TRACK_W);
+  return {
+    row: tileRow,
+    col: tileCol
+  }
+}
+
+function startButton() {
+  document.addEventListener('click', function (e) {
+    let mousePos = calculateMousePos(e);
+    if (mousePos.x > startButtonX && mousePos.x < startButtonX + widthStartButton && mousePos.y > startButtonY &&
+      mousePos.y < startButtonY + heightStartButton) {
+      startButtonTapped = true;
+      drawCount();
+      let interval = setInterval(function () {
+        startCount--;
+        drawCount();
+        if (startCount === 0) {
+          clearInterval(interval);
+        }
+      }, 1000)
+
+    }
+
+  }, { once: true })
+}
+
+function calculateMousePos(e) {
+  let rect = canvas.getBoundingClientRect(), root = document.documentElement;
+  let mouseX = e.clientX - rect.left - root.scrollLeft;
+  let mouseY = e.clientY - rect.top - root.scrollTop;
+  return {
+    x: mouseX,
+    y: mouseY
+  }
 }
