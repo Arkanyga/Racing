@@ -1,5 +1,5 @@
 
-const GROUNDSPEED_DECAY_MULT = 0.93,
+const GROUNDSPEED_DECAY_MULT = 0.95,
   DRIVE_POWER = 0.5,
   REVERSE_POWER = 0.2,
   TURN_RATE = 0.03,
@@ -52,7 +52,8 @@ class Car {
       clearInterval(this.timerInterval)
       let timeOneRound = this.timer - this.timeCounter;
       if (timeOneRound !== 0) {
-        this.bestTimeArr.push(this.timer - this.timeCounter)
+        this.bestTimeArr.push(this.timer - this.timeCounter);
+        this.bestTime = Math.min(...this.bestTimeArr);
       }
       this.timeCounter = this.timer;
       this.roundCounter++;
@@ -62,11 +63,10 @@ class Car {
           this.timer++;
         }, 1000 / 60);
       } else {
-        this.bestTime = Math.max(...this.bestTimeArr);
         this.achieveFinish = true;
       }
     }
-
+    console.log(this.bestTime)
     //разрешить проезд
     if ((trackAtPixelCoord(nextCarX, nextCarY) === TRACK_FINISH && rowDifference !== -1 ||
       trackAtPixelCoord(nextCarX, nextCarY) === TRACK_ROAD)) {
